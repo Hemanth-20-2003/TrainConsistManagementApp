@@ -1,29 +1,26 @@
 package com.trainconsistmanagementapp.main;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * =====================================================================
- * MAIN CLASS - UseCase9TrainConsistMgmnt
+ * MAIN CLASS - UseCase10TrainConsistMgmnt
  * =====================================================================
- * * Use Case 9: Group Bogies by Type (Collectors.groupingBy)
+ * * Use Case 10: Count Total Seats in Train (reduce)
  * * Description:
- * This class demonstrates how to categorize train bogies into 
- * groups using Stream collectors.
+ * This class aggregates seating capacities from all bogies into
+ * a single total value using Stream reduction.
  * * At this stage, the application:
- * - Creates a list of bogie objects
- * - Transforms the flat list into a Map using groupingBy
- * - Categorizes bogies by their name/type
- * - Displays the structured result
- * * This maps hierarchical data organization using Streams.
+ * - Extracts capacity values from bogie objects
+ * - Reduces multiple numeric values into a single sum
+ * - Provides quantitative insight for planning
+ * * This maps functional aggregation using reduce.
  * * @author Developer
- * @version 9.0
+ * @version 10.0
  */
 public class TrainConsistManagementApp {
 
-    // Reusing the static inner class
+    // Reusing the static inner class for consistency
     static class Bogie {
         String name;
         int capacity;
@@ -33,46 +30,41 @@ public class TrainConsistManagementApp {
             this.capacity = capacity;
         }
 
-        // Getter for grouping logic
-        public String getName() {
-            return name;
-        }
-
         @Override
         public String toString() {
-            return "[Name=" + name + ", Cap=" + capacity + "]";
+            return name + " (" + capacity + " seats)";
         }
     }
 
     public static void main(String[] args) {
 
         System.out.println("==========================================");
-        System.out.println(" UC9 - Group Bogies by Type ");
+        System.out.println(" UC10 - Count Total Seats in Train ");
         System.out.println("==========================================\n");
 
-        // Step 1: Create a list with multiple bogies of the same type
+        // Step 1: Initialize the train consist with various bogies
         List<Bogie> trainConsist = new ArrayList<>();
         trainConsist.add(new Bogie("Sleeper", 72));
         trainConsist.add(new Bogie("AC Chair", 56));
-        trainConsist.add(new Bogie("Sleeper", 72));
         trainConsist.add(new Bogie("First Class", 24));
-        trainConsist.add(new Bogie("AC Chair", 56));
+        trainConsist.add(new Bogie("Sleeper", 72));
+        trainConsist.add(new Bogie("General", 90));
 
-        System.out.println("Flat Train Consist List:");
+        System.out.println("Train Consist Details:");
         trainConsist.forEach(System.out::println);
 
-        // Step 2: Group bogies by their name using groupingBy
-        // This produces a Map where the Key is the Bogie name 
-        // and the Value is a List of all bogies of that type
-        Map<String, List<Bogie>> groupedBogies = trainConsist.stream()
-                .collect(Collectors.groupingBy(Bogie::getName));
+        // Step 2: Use map() to get capacities and reduce() to sum them
+        // map() transforms Bogie objects -> Integer values
+        // reduce(identity, accumulator) combines them into one result
+        int totalCapacity = trainConsist.stream()
+                .map(b -> b.capacity)
+                .reduce(0, Integer::sum);
 
-        // Step 3: Display the structured grouping
-        System.out.println("\nStructured Bogie Report (Grouped by Type):");
-        groupedBogies.forEach((type, list) -> {
-            System.out.println("Category: " + type + " -> Count: " + list.size() + " " + list);
-        });
+        // Step 3: Display the final aggregated metric
+        System.out.println("\n------------------------------------------");
+        System.out.println("TOTAL SEATING CAPACITY : " + totalCapacity);
+        System.out.println("------------------------------------------");
 
-        System.out.println("\nUC9 data categorization completed successfully...");
+        System.out.println("\nUC10 aggregation and numeric analytics completed.");
     }
 }
