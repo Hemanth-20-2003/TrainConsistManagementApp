@@ -1,51 +1,67 @@
 package com.trainconsistmanagementapp.main;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * =====================================================================
- * MAIN CLASS - UseCase6TrainConsistMgmnt
+ * MAIN CLASS - UseCase7TrainConsistMgmnt
  * =====================================================================
- * * Use Case 6: Map Bogie to Capacity (HashMap)
+ * Use Case 7: Sort Bogies by Capacity (Comparator)
  * * Description:
- * This class associates each bogie with its seating or 
- * load capacity using a key-value mapping structure.
+ * This class sorts passenger bogies based on their seating 
+ * capacity using a custom Comparator.
  * * At this stage, the application:
- * - Creates a HashMap for bogie-capacity mapping
- * - Inserts capacity values for each bogie
- * - Iterates through map entries
- * - Displays bogie and capacity information
- * * This maps lookup-based access using HashMap.
+ * - Creates Bogie objects
+ * - Stores them in a List
+ * - Applies custom sorting logic
+ * - Displays ranked bogie information
+ * * This maps custom object sorting using Comparator.
  * * @author Developer
- * @version 6.0
+ * @version 7.0
  */
 public class TrainConsistManagementApp {
 
-    public static void main(String[] args) {
+    /**
+     * STATIC INNER CLASS - Bogie
+     * Keeps the Bogie definition local to the Management App.
+     */
+    static class Bogie {
+        String name;
+        int capacity;
 
-        System.out.println("==========================================");
-        System.out.println(" UC6 - Map Bogie to Capacity (HashMap) ");
-        System.out.println("==========================================\n");
-
-        // HashMap stores data in key -> value format
-        // Key: Bogie Name (String), Value: Capacity (Integer)
-        Map<String, Integer> capacityMap = new HashMap<>();
-
-        // ---- Insert bogie capacities ----
-        // put() binds the key (Bogie) to the value (Capacity)
-        capacityMap.put("Sleeper", 72);
-        capacityMap.put("AC Chair", 56);
-        capacityMap.put("First Class", 24);
-        capacityMap.put("Cargo", 120);
-
-        System.out.println("Bogie Capacity Details:");
-
-        // Iterate through the map using entrySet()
-        // This allows us to access both the key and the value efficiently
-        for (Map.Entry<String, Integer> entry : capacityMap.entrySet()) {
-            System.out.println(entry.getKey() + " -> " + entry.getValue());
+        Bogie(String name, int capacity) {
+            this.name = name;
+            this.capacity = capacity;
         }
 
-        System.out.println("\nUC6 bogie-capacity mapping completed...");
+        @Override
+        public String toString() {
+            return name + " (Capacity: " + capacity + ")";
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("==========================================");
+        System.out.println(" UC7 - Sort Bogies by Capacity (Inner Class) ");
+        System.out.println("==========================================\n");
+
+        List<Bogie> passengerBogies = new ArrayList<>();
+
+        // We can now instantiate Bogie directly within the main class
+        passengerBogies.add(new Bogie("Sleeper", 72));
+        passengerBogies.add(new Bogie("AC Chair", 56));
+        passengerBogies.add(new Bogie("First Class", 24));
+        passengerBogies.add(new Bogie("General", 90));
+
+
+        System.out.println("Before Sorting Train Consist (by Capacity):");
+        passengerBogies.forEach(System.out::println);
+        // Sort by capacity using a Comparator
+        passengerBogies.sort(Comparator.comparingInt(b -> b.capacity));
+
+        System.out.println("\n\nSorted Train Consist (by Capacity):");
+        passengerBogies.forEach(System.out::println);
+        
     }
 }
