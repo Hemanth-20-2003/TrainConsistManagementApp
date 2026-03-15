@@ -1,68 +1,82 @@
 package com.trainconsistmanagementapp.main;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * =====================================================================
- * MAIN CLASS - UseCase11TrainConsistMgmnt
+ * MAIN CLASS - UseCase12TrainConsistMgmnt
  * =====================================================================
- * * Use Case 11: Validate Train ID & Cargo Codes (Regex)
+ * * Use Case 12: Safety Compliance Check for Goods Bogies
  * * Description:
- * This class ensures data integrity by validating input formats
- * using Regular Expressions (Pattern and Matcher).
+ * This class enforces domain safety rules using Stream API terminal
+ * operations to ensure cargo is compatible with bogie types.
  * * At this stage, the application:
- * - Compiles regex patterns for Train IDs and Cargo Codes
- * - Uses Matcher to verify input strings
- * - Enforces strict business rules for naming conventions
- * - Prevents malformed data from entering the consist
- * * This maps input validation using Regex.
+ * - Validates bogie-cargo compatibility
+ * - Uses allMatch() for total consist verification
+ * - Applies business logic via Lambda expressions
+ * - Prevents hazardous configurations
+ * * This maps safety auditing using Streams.
  * * @author Developer
- * @version 11.0
+ * @version 12.0
  */
 public class TrainConsistManagementApp {
 
-    public static void main(String[] args) {
+	/**
+	 * STATIC INNER CLASS - GoodsBogie
+	 * Represents a cargo-carrying unit with a specific shape and payload.
+	 */
+	static class GoodsBogie {
+		String type;  // e.g., Cylindrical, Box, Flatbed
+		String cargo; // e.g., Petroleum, Coal, Iron
 
-        System.out.println("==========================================");
-        System.out.println(" UC11 - Validate Train ID & Cargo Codes ");
-        System.out.println("==========================================\n");
+		GoodsBogie(String type, String cargo) {
+			this.type = type;
+			this.cargo = cargo;
+		}
 
-        // Step 1: Define Regex Patterns
-        // TRN-\\d{4} expects "TRN-" followed by exactly 4 digits
-        String trainIdRegex = "TRN-\\d{4}";
-        // PET-[A-Z]{2} expects "PET-" followed by exactly 2 uppercase letters
-        String cargoCodeRegex = "PET-[A-Z]{2}";
+		@Override
+		public String toString() {
+			return "[" + type + " bogie carrying " + cargo + "]";
+		}
+	}
 
-        // Step 2: Compile Patterns
-        Pattern trainIdPattern = Pattern.compile(trainIdRegex);
-        Pattern cargoCodePattern = Pattern.compile(cargoCodeRegex);
-        Scanner sc=new Scanner(System.in);
-        // Step 3: Test Inputs
-        System.out.println("Enter Train ID - (format TRN-1234)");
-        String inputTrainId =sc.nextLine();
-        System.out.println("Enter Cargo ID - (format PET-AB)");
-        String inputCargoCode = sc.nextLine(); 
+	public static void main(String[] args) {
 
-        // Step 4: Validate Using Matcher
-        validateInput("Train ID", inputTrainId, trainIdPattern);
-        validateInput("Cargo Code", inputCargoCode, cargoCodePattern);
+		System.out.println("==========================================");
+		System.out.println(" UC12 - Safety Compliance Check ");
+		System.out.println("==========================================\n");
 
-        System.out.println("\nUC11 validation logic completed.");
-    }
+		// Step 1: Prepare a list of goods bogies
+		List<GoodsBogie> goodsConsist = new ArrayList<>();
+		goodsConsist.add(new GoodsBogie("Cylindrical", "Petroleum"));
+		goodsConsist.add(new GoodsBogie("Box", "Coal"));
+		goodsConsist.add(new GoodsBogie("Cylindrical", "Petroleum"));
+		// Uncomment the line below to test a safety violation:
+		// goodsConsist.add(new GoodsBogie("Cylindrical", "Coal")); 
 
-    /**
-     * Helper method to validate and print results
-     */
-    private static void validateInput(String label, String input, Pattern pattern) {
-        Matcher matcher = pattern.matcher(input);
-        
-        System.out.print("Validating " + label + ": [" + input + "] -> ");
-        
-        if (matcher.matches()) {
-            System.out.println("VALID ✅");
-        } else {
-            System.out.println("INVALID ❌ (Does not match required format)");
-        }
-    }
+		System.out.println("Current Goods Consist:");
+		goodsConsist.forEach(System.out::println);
+
+		// Step 2: Use allMatch() to validate safety rules
+		// Rule: If the bogie is "Cylindrical", it MUST carry "Petroleum"
+		boolean isSafetyCompliant = goodsConsist.stream().allMatch(b -> {
+			if (b.type.equalsIgnoreCase("Cylindrical")) {
+				return b.cargo.equalsIgnoreCase("Petroleum");
+			}
+			return true; // Other types are considered safe for this demo
+		});
+
+		// Step 3: Display results
+		System.out.println("\n------------------------------------------");
+		if (isSafetyCompliant) {
+			System.out.println("STATUS: SAFETY COMPLIANT : True");
+			System.out.println("The train is cleared for departure.");
+		} else {
+			System.out.println("STATUS: SAFETY VIOLATION : False");
+			System.out.println("Action Required: Check Cylindrical bogie cargo!");
+		}
+		System.out.println("------------------------------------------");
+
+		System.out.println("\nUC12 safety compliance audit completed.");
+	}
 }
