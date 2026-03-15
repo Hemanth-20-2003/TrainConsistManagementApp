@@ -1,70 +1,84 @@
 package com.trainconsistmanagementapp.main;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+/**
+ * =====================================================================
+ * CUSTOM EXCEPTION - InvalidCapacityException
+ * =====================================================================
+ * Thrown when a bogie is created with a capacity <= 0.
+ */
+class InvalidCapacityException extends Exception {
+    public InvalidCapacityException(String message) {
+        super(message);
+    }
+}
 
 /**
  * =====================================================================
- * MAIN CLASS - UseCase13TrainConsistMgmnt
+ * MAIN CLASS - UseCase14TrainConsistMgmnt
  * =====================================================================
- * * Use Case 13: Performance Comparison (Loops vs Streams)
+ * * Use Case 14: Handle Invalid Bogie Capacity (Custom Exception)
  * * Description:
- * This class measures and compares the execution time of traditional
- * loop-based filtering versus modern Stream-based filtering.
+ * This class prevents the creation of invalid bogies by enforcing
+ * business rules through custom exception handling.
  * * At this stage, the application:
- * - Benchmarks code using System.nanoTime()
- * - Compares imperative (Loop) vs declarative (Stream) styles
- * - Provides evidence-based performance insights
- * * This maps performance benchmarking concepts.
+ * - Defines a custom checked exception
+ * - Validates data during object construction
+ * - Uses 'throw' and 'throws' keywords
+ * - Implements a fail-fast validation strategy
+ * * This maps domain-specific error handling.
  * * @author Developer
- * @version 13.0
+ * @version 14.0
  */
 public class TrainConsistManagementApp {
 
-    public static void main(String[] args) {
+    /**
+     * STATIC INNER CLASS - PassengerBogie
+     * Validates capacity before allowing object instantiation.
+     */
+    static class PassengerBogie {
+        String name;
+        int capacity;
 
+        // Constructor declaring it can throw our custom exception
+        public PassengerBogie(String name, int capacity) throws InvalidCapacityException {
+            if (capacity <= 0) {
+                // Rule violation detected: Fail fast!
+                throw new InvalidCapacityException("Invalid capacity (" + capacity + 
+                                                   ") for bogie: " + name + 
+                                                   ". Capacity must be greater than zero.");
+            }
+            this.name = name;
+            this.capacity = capacity;
+        }
+
+        @Override
+        public String toString() {
+            return name + " [" + capacity + " seats]";
+        }
+    }
+
+    public static void main(String[] args) {
         System.out.println("==========================================");
-        System.out.println(" UC13 - Performance Comparison ");
+        System.out.println(" UC14 - Handle Invalid Bogie Capacity ");
         System.out.println("==========================================\n");
 
-        // Step 1: Prepare a large collection of bogies for benchmarking
-        List<String> largeTrainConsist = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
-            largeTrainConsist.add("Bogie-" + i);
+        // Test Case 1: Attempt to create a valid bogie
+        try {
+            PassengerBogie validBogie = new PassengerBogie("Sleeper", 72);
+            System.out.println("SUCCESS: Created " + validBogie);
+        } catch (InvalidCapacityException e) {
+            System.out.println("ERROR: " + e.getMessage());
         }
 
-        // --- BENCHMARK 1: Traditional Loop ---
-        long startLoop = System.nanoTime();
-        List<String> loopResult = new ArrayList<>();
-        for (String bogie : largeTrainConsist) {
-            if (bogie.contains("5")) { // Arbitrary filter condition
-                loopResult.add(bogie);
-            }
-        }
-        long endLoop = System.nanoTime();
-        long loopDuration = endLoop - startLoop;
-
-        // --- BENCHMARK 2: Stream API ---
-        long startStream = System.nanoTime();
-        List<String> streamResult = largeTrainConsist.stream()
-                .filter(b -> b.contains("5"))
-                .collect(Collectors.toList());
-        long endStream = System.nanoTime();
-        long streamDuration = endStream - startStream;
-
-        // Step 3: Display Results
-        System.out.println("Benchmarking Results (10,000 Bogies):");
-        System.out.println("------------------------------------------");
-        System.out.println("Loop Duration   : " + loopDuration + " nanoseconds");
-        System.out.println("Stream Duration : " + streamDuration + " nanoseconds");
-        System.out.println("------------------------------------------");
-
-        if (loopDuration < streamDuration) {
-            System.out.println("Result: Traditional Loop was faster in this run.");
-        } else {
-            System.out.println("Result: Stream API was faster in this run.");
+        // Test Case 2: Attempt to create an invalid bogie (Negative Capacity)
+        try {
+            System.out.println("\nAttempting to create invalid bogie...");
+            PassengerBogie invalidBogie = new PassengerBogie("AC Chair", -10);
+            System.out.println("SUCCESS: " + invalidBogie); // This won't run
+        } catch (InvalidCapacityException e) {
+            // Business rule enforcement in action
+            System.err.println("VALIDATION FAILED: " + e.getMessage());
         }
 
-        System.out.println("\nUC13 performance measurement completed.");
+        System.out.println("\nUC14 exception handling completed.");
     }
 }
