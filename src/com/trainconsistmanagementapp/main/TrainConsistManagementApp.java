@@ -1,70 +1,68 @@
 package com.trainconsistmanagementapp.main;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * =====================================================================
- * MAIN CLASS - UseCase10TrainConsistMgmnt
+ * MAIN CLASS - UseCase11TrainConsistMgmnt
  * =====================================================================
- * * Use Case 10: Count Total Seats in Train (reduce)
+ * * Use Case 11: Validate Train ID & Cargo Codes (Regex)
  * * Description:
- * This class aggregates seating capacities from all bogies into
- * a single total value using Stream reduction.
+ * This class ensures data integrity by validating input formats
+ * using Regular Expressions (Pattern and Matcher).
  * * At this stage, the application:
- * - Extracts capacity values from bogie objects
- * - Reduces multiple numeric values into a single sum
- * - Provides quantitative insight for planning
- * * This maps functional aggregation using reduce.
+ * - Compiles regex patterns for Train IDs and Cargo Codes
+ * - Uses Matcher to verify input strings
+ * - Enforces strict business rules for naming conventions
+ * - Prevents malformed data from entering the consist
+ * * This maps input validation using Regex.
  * * @author Developer
- * @version 10.0
+ * @version 11.0
  */
 public class TrainConsistManagementApp {
-
-    // Reusing the static inner class for consistency
-    static class Bogie {
-        String name;
-        int capacity;
-
-        Bogie(String name, int capacity) {
-            this.name = name;
-            this.capacity = capacity;
-        }
-
-        @Override
-        public String toString() {
-            return name + " (" + capacity + " seats)";
-        }
-    }
 
     public static void main(String[] args) {
 
         System.out.println("==========================================");
-        System.out.println(" UC10 - Count Total Seats in Train ");
+        System.out.println(" UC11 - Validate Train ID & Cargo Codes ");
         System.out.println("==========================================\n");
 
-        // Step 1: Initialize the train consist with various bogies
-        List<Bogie> trainConsist = new ArrayList<>();
-        trainConsist.add(new Bogie("Sleeper", 72));
-        trainConsist.add(new Bogie("AC Chair", 56));
-        trainConsist.add(new Bogie("First Class", 24));
-        trainConsist.add(new Bogie("Sleeper", 72));
-        trainConsist.add(new Bogie("General", 90));
+        // Step 1: Define Regex Patterns
+        // TRN-\\d{4} expects "TRN-" followed by exactly 4 digits
+        String trainIdRegex = "TRN-\\d{4}";
+        // PET-[A-Z]{2} expects "PET-" followed by exactly 2 uppercase letters
+        String cargoCodeRegex = "PET-[A-Z]{2}";
 
-        System.out.println("Train Consist Details:");
-        trainConsist.forEach(System.out::println);
+        // Step 2: Compile Patterns
+        Pattern trainIdPattern = Pattern.compile(trainIdRegex);
+        Pattern cargoCodePattern = Pattern.compile(cargoCodeRegex);
+        Scanner sc=new Scanner(System.in);
+        // Step 3: Test Inputs
+        System.out.println("Enter Train ID - (format TRN-1234)");
+        String inputTrainId =sc.nextLine();
+        System.out.println("Enter Cargo ID - (format PET-AB)");
+        String inputCargoCode = sc.nextLine(); 
 
-        // Step 2: Use map() to get capacities and reduce() to sum them
-        // map() transforms Bogie objects -> Integer values
-        // reduce(identity, accumulator) combines them into one result
-        int totalCapacity = trainConsist.stream()
-                .map(b -> b.capacity)
-                .reduce(0, Integer::sum);
+        // Step 4: Validate Using Matcher
+        validateInput("Train ID", inputTrainId, trainIdPattern);
+        validateInput("Cargo Code", inputCargoCode, cargoCodePattern);
 
-        // Step 3: Display the final aggregated metric
-        System.out.println("\n------------------------------------------");
-        System.out.println("TOTAL SEATING CAPACITY : " + totalCapacity);
-        System.out.println("------------------------------------------");
+        System.out.println("\nUC11 validation logic completed.");
+    }
 
-        System.out.println("\nUC10 aggregation and numeric analytics completed.");
+    /**
+     * Helper method to validate and print results
+     */
+    private static void validateInput(String label, String input, Pattern pattern) {
+        Matcher matcher = pattern.matcher(input);
+        
+        System.out.print("Validating " + label + ": [" + input + "] -> ");
+        
+        if (matcher.matches()) {
+            System.out.println("VALID ✅");
+        } else {
+            System.out.println("INVALID ❌ (Does not match required format)");
+        }
     }
 }
