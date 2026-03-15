@@ -1,84 +1,89 @@
 package com.trainconsistmanagementapp.main;
 /**
  * =====================================================================
- * CUSTOM EXCEPTION - InvalidCapacityException
+ * CUSTOM RUNTIME EXCEPTION - CargoSafetyException
  * =====================================================================
- * Thrown when a bogie is created with a capacity <= 0.
+ * An unchecked exception thrown when unsafe cargo-bogie combinations 
+ * are attempted during runtime operations.
  */
-class InvalidCapacityException extends Exception {
-    public InvalidCapacityException(String message) {
+class CargoSafetyException extends RuntimeException {
+    public CargoSafetyException(String message) {
         super(message);
     }
 }
 
 /**
  * =====================================================================
- * MAIN CLASS - UseCase14TrainConsistMgmnt
+ * MAIN CLASS - UseCase15TrainConsistMgmnt
  * =====================================================================
- * * Use Case 14: Handle Invalid Bogie Capacity (Custom Exception)
+ * * Use Case 15: Safe Cargo Assignment Using try-catch-finally
  * * Description:
- * This class prevents the creation of invalid bogies by enforcing
- * business rules through custom exception handling.
+ * This class handles unsafe operational assignments without crashing
+ * the application by using structured exception handling.
  * * At this stage, the application:
- * - Defines a custom checked exception
- * - Validates data during object construction
- * - Uses 'throw' and 'throws' keywords
- * - Implements a fail-fast validation strategy
- * * This maps domain-specific error handling.
+ * - Implements a runtime safety check
+ * - Catches domain-specific exceptions
+ * - Uses the finally block for mandatory logging
+ * - Demonstrates graceful recovery from errors
+ * * This maps operational resilience using try-catch-finally.
  * * @author Developer
- * @version 14.0
+ * @version 15.0
  */
 public class TrainConsistManagementApp {
 
     /**
-     * STATIC INNER CLASS - PassengerBogie
-     * Validates capacity before allowing object instantiation.
+     * STATIC INNER CLASS - GoodsBogie
+     * Represents a cargo unit that validates assignments at runtime.
      */
-    static class PassengerBogie {
-        String name;
-        int capacity;
+    static class GoodsBogie {
+        String shape; // e.g., Cylindrical, Rectangular
+        String assignedCargo;
 
-        // Constructor declaring it can throw our custom exception
-        public PassengerBogie(String name, int capacity) throws InvalidCapacityException {
-            if (capacity <= 0) {
-                // Rule violation detected: Fail fast!
-                throw new InvalidCapacityException("Invalid capacity (" + capacity + 
-                                                   ") for bogie: " + name + 
-                                                   ". Capacity must be greater than zero.");
-            }
-            this.name = name;
-            this.capacity = capacity;
+        public GoodsBogie(String shape) {
+            this.shape = shape;
         }
 
-        @Override
-        public String toString() {
-            return name + " [" + capacity + " seats]";
+        /**
+         * Assigns cargo while enforcing safety rules.
+         * Throws CargoSafetyException if the combination is hazardous.
+         */
+        public void assignCargo(String cargo) {
+            System.out.println("Initiating assignment: [" + cargo + "] to [" + shape + "] bogie...");
+            
+            // Rule: Petroleum cannot be carried in a Rectangular bogie (Leak/Fire risk)
+            if (shape.equalsIgnoreCase("Rectangular") && cargo.equalsIgnoreCase("Petroleum")) {
+                throw new CargoSafetyException("SAFETY ALERT: Cannot assign Petroleum to a Rectangular bogie!");
+            }
+            
+            this.assignedCargo = cargo;
+            System.out.println("Assignment Successful: Cargo updated to " + cargo);
         }
     }
 
     public static void main(String[] args) {
         System.out.println("==========================================");
-        System.out.println(" UC14 - Handle Invalid Bogie Capacity ");
+        System.out.println(" UC15 - Safe Cargo Assignment Operations ");
         System.out.println("==========================================\n");
 
-        // Test Case 1: Attempt to create a valid bogie
+        GoodsBogie storageBogie = new GoodsBogie("Rectangular");
+
+        // Use try-catch-finally to manage the dangerous assignment
         try {
-            PassengerBogie validBogie = new PassengerBogie("Sleeper", 72);
-            System.out.println("SUCCESS: Created " + validBogie);
-        } catch (InvalidCapacityException e) {
-            System.out.println("ERROR: " + e.getMessage());
+            // Attempting a hazardous assignment
+            storageBogie.assignCargo("Petroleum");
+            
+        } catch (CargoSafetyException e) {
+            // Catch the specific domain error and provide feedback
+            System.err.println("OPERATIONAL ERROR: " + e.getMessage());
+            System.err.println("Action Denied: Reverting to previous safety state.");
+            
+        } finally {
+            // This block runs regardless of success or failure
+            System.out.println("LOG: Cargo assignment attempt processed. System state synchronized.");
         }
 
-        // Test Case 2: Attempt to create an invalid bogie (Negative Capacity)
-        try {
-            System.out.println("\nAttempting to create invalid bogie...");
-            PassengerBogie invalidBogie = new PassengerBogie("AC Chair", -10);
-            System.out.println("SUCCESS: " + invalidBogie); // This won't run
-        } catch (InvalidCapacityException e) {
-            // Business rule enforcement in action
-            System.err.println("VALIDATION FAILED: " + e.getMessage());
-        }
-
-        System.out.println("\nUC14 exception handling completed.");
+        System.out.println("\n------------------------------------------");
+        System.out.println("Program continues: System is still stable.");
+        System.out.println("------------------------------------------");
     }
 }
