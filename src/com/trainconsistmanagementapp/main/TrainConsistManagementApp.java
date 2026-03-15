@@ -1,72 +1,61 @@
 package com.trainconsistmanagementapp.main;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * =====================================================================
- * MAIN CLASS - UseCase19TrainConsistMgmnt
+ * MAIN CLASS - UseCase20TrainConsistMgmnt
  * =====================================================================
- * * Use Case 19: Binary Search for Bogie ID (Optimized)
+ * * Use Case 20: Exception Handling During Search Operations
  * * Description:
- * This class implements a Divide-and-Conquer search strategy to 
- * find a bogie ID in an O(log n) time complexity.
+ * This class demonstrates defensive programming by ensuring the 
+ * system state is valid before performing search operations.
  * * At this stage, the application:
- * - Requires sorted data as a precondition
- * - Uses low, high, and mid indexes to narrow the search
- * - Employs String.compareTo() for alphabetical navigation
- * - Provides ultra-fast lookups for large train consists
- * * This maps optimized searching algorithms.
+ * - Checks if the bogie collection is empty
+ * - Throws IllegalStateException for invalid states
+ * - Implements the Fail-Fast principle
+ * - Provides meaningful feedback to the operator
+ * * This maps state validation and defensive coding.
  * * @author Developer
- * @version 19.0
+ * @version 20.0
  */
 public class TrainConsistManagementApp {
 
     public static void main(String[] args) {
 
         System.out.println("==========================================");
-        System.out.println(" UC19 - Binary Search (Divide & Conquer) ");
+        System.out.println(" UC20 - Defensive Search Validation ");
         System.out.println("==========================================\n");
 
-        // Step 1: Precondition - The data MUST be sorted
-        String[] bogieIds = {"BG-101", "BG-102", "BG-103", "BG-104", "BG-105"};
-        String searchKey = "BG-104";
+        // Scenario: An empty train consist
+        List<String> emptyConsist = new ArrayList<>();
+        String searchTarget = "BG-101";
 
-        System.out.println("Sorted IDs: " + Arrays.toString(bogieIds));
-        System.out.println("Searching for: " + searchKey + "\n");
+        System.out.println("Attempting to search in the train formation...");
 
-        // Step 2: Initialize Binary Search Variables
-        int low = 0;
-        int high = bogieIds.length - 1;
-        int resultIndex = -1;
-
-        // Step 3: Binary Search Logic
-        while (low <= high) {
-            int mid = low + (high - low) / 2; // Calculate mid index safely
-
-            // compareTo() returns:
-            // 0 if equal
-            // < 0 if searchKey is smaller (go left)
-            // > 0 if searchKey is larger (go right)
-            int comparison = searchKey.compareTo(bogieIds[mid]);
-
-            if (comparison == 0) {
-                resultIndex = mid;
-                break; // Found it!
-            } else if (comparison < 0) {
-                high = mid - 1; // Discard right half
-            } else {
-                low = mid + 1; // Discard left half
-            }
+        try {
+            // Step 1: Perform Defensive Validation
+            performSearch(emptyConsist, searchTarget);
+            
+        } catch (IllegalStateException e) {
+            // Step 2: Handle the invalid state gracefully
+            System.err.println("SEARCH ABORTED: " + e.getMessage());
         }
 
-        // Step 4: Display Result
-        if (resultIndex != -1) {
-            System.out.println("MATCH FOUND ✅");
-            System.out.println("Bogie " + searchKey + " located at position: " + (resultIndex + 1));
-        } else {
-            System.out.println("MATCH NOT FOUND ❌");
-            System.out.println("Bogie ID " + searchKey + " does not exist in this consist.");
+        System.out.println("\nUC20 state validation completed.");
+    }
+
+    /**
+     * Searches for a bogie but validates system state first.
+     * @throws IllegalStateException if the list is empty
+     */
+    public static void performSearch(List<String> consist, String key) {
+        // Defensive Check: Fail-Fast if the train is empty
+        if (consist == null || consist.isEmpty()) {
+            throw new IllegalStateException("The train consist is currently empty. Add bogies before searching.");
         }
 
-        System.out.println("\nUC19 optimized search operation completed.");
+        // Search logic would go here if state was valid
+        System.out.println("Searching for " + key + "...");
     }
 }
