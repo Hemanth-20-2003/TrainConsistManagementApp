@@ -1,1 +1,3 @@
 # TrainConsistManagementApp
+## UC1: Initialize Train and Display Consist Summary
+This use case initializes the Train Consist Management application and displays the initial state of the train formation. The program starts from the `main()` method, prints a welcome message, and creates an empty `ArrayList` to store train bogies. Since no bogies are added initially, the system displays the starting bogie count using the `size()` method. This use case introduces the concept of application startup flow and demonstrates why dynamic collections like `ArrayList` are useful instead of fixed-size arrays.
