@@ -16,3 +16,33 @@ This use case introduces `LinkedHashSet` to maintain both uniqueness and inserti
 
 ## UC6: Map Bogie to Capacity (HashMap)
 This use case associates each bogie with its seating or load capacity using a `HashMap`. The bogie name acts as the key, while its capacity acts as the value. Using the `put()` method, capacities for bogies such as Sleeper, AC Chair, and First Class are stored in the map. The program then iterates through the map using `entrySet()` to display each bogie along with its capacity. This demonstrates key–value data modeling and shows how maps allow fast lookup of attributes related to specific train components.
+
+## UC7: Sort Bogies by Capacity (Comparator)
+This use case demonstrates sorting bogie objects based on seating capacity using a `Comparator`. Bogies are represented as custom objects and stored in a list. The `Comparator` defines custom comparison logic so that bogies can be arranged in ascending order of capacity, improving planning and reporting capabilities.
+
+## UC8: Filter Passenger Bogies Using Streams
+This use case introduces the Java Stream API to filter bogies based on capacity conditions. The bogie list is converted into a stream, and the `filter()` operation selects bogies that satisfy a defined rule. The filtered results are collected into a new list, demonstrating concise and readable data processing.
+
+## UC9: Group Bogies by Type (Collectors.groupingBy)
+This use case groups bogies into categories using `Collectors.groupingBy()`. The stream pipeline classifies bogies based on a selected property and stores them in a `Map` where each key represents a category and the value is a list of bogies belonging to that group. This transformation converts flat data into structured groups useful for reporting.
+
+## UC10: Count Total Seats in Train (reduce)
+This use case calculates the total seating capacity of the train using stream aggregation. The bogie list is converted to a stream, capacities are extracted using `map()`, and `reduce()` is applied to compute the total sum. This demonstrates functional-style aggregation and provides operational metrics.
+
+## UC11: Validate Train ID & Cargo Codes (Regex)
+This use case validates user input formats using regular expressions. The `Pattern` and `Matcher` classes are used to verify whether Train IDs and Cargo Codes match predefined patterns. This ensures only correctly formatted data enters the system and protects downstream operations from invalid input.
+
+## UC12: Safety Compliance Check for Goods Bogies
+This use case enforces safety rules for cargo assignments using the Stream API. Goods bogies are evaluated using the `allMatch()` operation to ensure that specific cargo types are allowed only in compatible bogie shapes. If all rules pass, the train is marked safe for operation.
+
+## UC13: Performance Comparison (Loops vs Streams)
+This use case measures execution time of loop-based and stream-based operations using `System.nanoTime()`. By benchmarking both approaches, the program demonstrates how developers can evaluate performance differences instead of relying on assumptions.
+
+## UC14: Handle Invalid Bogie Capacity (Custom Exception)
+This use case introduces a custom checked exception to prevent creation of bogies with invalid capacity values. If the capacity is less than or equal to zero, an `InvalidCapacityException` is thrown during object construction, enforcing domain rules at the earliest stage.
+
+## UC15: Safe Cargo Assignment Using try-catch-finally
+This use case demonstrates structured exception handling during runtime cargo assignments. If unsafe cargo combinations are attempted, a custom runtime exception is thrown and caught using `try-catch`. The `finally` block executes cleanup or logging operations, ensuring the application continues safely.
+
+## UC16: Sort Passenger Bogies by Capacity (Bubble Sort)
+This use case introduces the Bubble Sort algorithm to manually sort passenger capacities without using built-in libraries. The algorithm repeatedly compares adjacent elements and swaps them when they are out of order. This teaches the internal logic behind sorting algorithms.
